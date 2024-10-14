@@ -1,5 +1,4 @@
-#include <iostream>
-#include <string>
+#include <bits/stdc++.h>
 using namespace std;
 
 // Function to extend the keyword to match the length of the plaintext/ciphertext
