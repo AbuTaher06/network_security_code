@@ -5,31 +5,32 @@ using namespace std;
 string generateKey(string str, string key) {
     int strLen = str.length();
     int keyLen = key.length();
-    
-    string extendedKey = key;
-    
-    // Repeat the key until it matches the length of the plaintext
-    for (int i = 0; extendedKey.length() < strLen; i++) {
-        extendedKey += key[i % keyLen];
+    string extendedKey = "";
+    int j = 0;  // Index for the key
+
+    // Extend the key to match only the alphabetic characters of the plaintext
+    for (int i = 0; i < strLen; i++) {
+        if (isalpha(str[i])) {
+            extendedKey += key[j % keyLen];  // Add key character
+            j++;  // Move to the next character in the key
+        }
     }
-    
+
     return extendedKey;
 }
 
 // Function to encrypt the plaintext using Vigenère Cipher
 string encrypt(string plaintext, string key) {
     string ciphertext = "";
-    
-    // Extend the key to match the length of the plaintext
     string extendedKey = generateKey(plaintext, key);
-    
-    for (int i = 0; i < plaintext.length(); i++) {
-        if (isalpha(plaintext[i])) {  // Encrypt only alphabetic characters
+
+    // Encrypt the plaintext
+    for (int i = 0, k = 0; i < plaintext.length(); i++) {
+        if (isalpha(plaintext[i])) {
             char base = islower(plaintext[i]) ? 'a' : 'A';
-            char keyChar = islower(plaintext[i]) ? tolower(extendedKey[i]) : toupper(extendedKey[i]);
-            ciphertext += (plaintext[i] - base + (keyChar - base)) % 26 + base;  // Vigenère encryption formula
-        } else {
-            ciphertext += plaintext[i];  // Non-alphabetic characters remain unchanged
+            char keyChar = islower(plaintext[i]) ? tolower(extendedKey[k]) : toupper(extendedKey[k]);
+            ciphertext += toupper((plaintext[i] - base + (keyChar - base)) % 26 + base);  // Vigenère encryption formula
+            k++;  // Move to the next character in the extended key
         }
     }
     return ciphertext;
@@ -38,15 +39,15 @@ string encrypt(string plaintext, string key) {
 // Function to decrypt the ciphertext using Vigenère Cipher
 string decrypt(string ciphertext, string key) {
     string plaintext = "";
-    
-    // Extend the key to match the length of the ciphertext
     string extendedKey = generateKey(ciphertext, key);
-    
-    for (int i = 0; i < ciphertext.length(); i++) {
-        if (isalpha(ciphertext[i])) {  // Decrypt only alphabetic characters
+
+    // Decrypt the ciphertext
+    for (int i = 0, k = 0; i < ciphertext.length(); i++) {
+        if (isalpha(ciphertext[i])) {
             char base = islower(ciphertext[i]) ? 'a' : 'A';
-            char keyChar = islower(ciphertext[i]) ? tolower(extendedKey[i]) : toupper(extendedKey[i]);
-            plaintext += (ciphertext[i] - base - (keyChar - base) + 26) % 26 + base;  // Vigenère decryption formula
+            char keyChar = islower(ciphertext[i]) ? tolower(extendedKey[k]) : toupper(extendedKey[k]);
+            plaintext += (ciphertext[i] - 'A' - (keyChar - 'A') + 26) % 26 + 'A';  // Vigenère decryption formula
+            k++;  // Move to the next character in the extended key
         } else {
             plaintext += ciphertext[i];  // Non-alphabetic characters remain unchanged
         }
