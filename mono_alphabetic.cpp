@@ -1,83 +1,43 @@
-#include <iostream>
-#include <string>
-#include <unordered_map>
-
+#include <bits/stdc++.h>
 using namespace std;
 
-// Function to create a mapping for encryption using the substitution table
-unordered_map<char, char> createEncryptionMap() {
-    string plaintext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    string ciphertext = "QWERTYUIOPASDFGHJKLZXCVBNM";
-    unordered_map<char, char> encryptionMap;
-
-    for (int i = 0; i < plaintext.length(); i++) {
-        encryptionMap[plaintext[i]] = ciphertext[i];
+unordered_map<char, char> createMap(const string& from, const string& to) {
+    unordered_map<char, char> m;
+    for (size_t i = 0; i < from.size(); i++) {
+        m[from[i]] = to[i];
     }
-
-    return encryptionMap;
+    return m;
 }
 
-// Function to create a mapping for decryption using the substitution table
-unordered_map<char, char> createDecryptionMap() {
-    string plaintext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    string ciphertext = "QWERTYUIOPASDFGHJKLZXCVBNM";
-    unordered_map<char, char> decryptionMap;
-
-    for (int i = 0; i < ciphertext.length(); i++) {
-        decryptionMap[ciphertext[i]] = plaintext[i];
-    }
-
-    return decryptionMap;
-}
-
-// Function to encrypt the plaintext using the monoalphabetic cipher
-string encrypt(string plaintext) {
-    unordered_map<char, char> encryptionMap = createEncryptionMap();
-    string ciphertext = "";
-
-    for (char c : plaintext) {
+string processText(const string& text, const unordered_map<char, char>& mapping) {
+    string result;
+    for (char c : text) {
         if (isalpha(c)) {
-            c = toupper(c); // Convert to uppercase for uniformity
-            ciphertext += encryptionMap[c]; // Encrypt the character
+            c = toupper(c);
+            result += mapping.at(c);
         } else {
-            ciphertext += c; // Preserve spaces and other non-alphabet characters
+            result += c;
         }
     }
-
-    return ciphertext;
-}
-
-// Function to decrypt the ciphertext using the monoalphabetic cipher
-string decrypt(string ciphertext) {
-    unordered_map<char, char> decryptionMap = createDecryptionMap();
-    string plaintext = "";
-
-    for (char c : ciphertext) {
-        if (isalpha(c)) {
-            c = toupper(c); // Convert to uppercase for uniformity
-            plaintext += decryptionMap[c]; // Decrypt the character
-        } else {
-            plaintext += c; // Preserve spaces and other non-alphabet characters
-        }
-    }
-
-    return plaintext;
+    return result;
 }
 
 int main() {
-    string plaintext, ciphertext, decryptedText;
-    
-    // Input plaintext
+    string plaintext, ciphertext;
+    string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    string cipher = "QWERTYUIOPASDFGHJKLZXCVBNM";
+
     cout << "Enter the plaintext: ";
     getline(cin, plaintext);
-    
-    // Encryption
-    ciphertext = encrypt(plaintext);
+
+    auto encryptionMap = createMap(alphabet, cipher);
+    ciphertext = processText(plaintext, encryptionMap);
     cout << "Encrypted Ciphertext: " << ciphertext << endl;
-    
-    // Decryption
-    decryptedText = decrypt(ciphertext);
+
+    auto decryptionMap = createMap(cipher, alphabet);
+    string decryptedText = processText(ciphertext, decryptionMap);
+    transform(decryptedText.begin(),decryptedText.end(),decryptedText.begin(),::tolower);
     cout << "Decrypted Plaintext: " << decryptedText << endl;
-    
+
     return 0;
 }
