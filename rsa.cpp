@@ -3,86 +3,85 @@
 
 using namespace std;
 
-// Function to compute gcd
+// Function to compute the greatest common divisor (GCD)
 int gcd(int a, int b) {
-    while (b != 0) {
-        int temp = b;
-        b = a % b;
-        a = temp;
-    }
-    return a;
+    return b == 0 ? a : gcd(b, a % b);
 }
 
-// Function to compute modular inverse of e mod phi (extended Euclidean algorithm)
+// Function to find the modular inverse
 int modInverse(int e, int phi) {
-    int t = 0, newT = 1;
-    int r = phi, newR = e;
-
-    while (newR != 0) {
-        int quotient = r / newR;
-        int tempT = t;
-        t = newT;
-        newT = tempT - quotient * newT;
-
-        int tempR = r;
-        r = newR;
-        newR = tempR - quotient * newR;
+    for (int d = 1; d < phi; d++) {
+        if ((e * d) % phi == 1) {
+            return d;
+        }
     }
-
-    if (t < 0) {
-        t += phi;
-    }
-
-    return t;
+    return -1;
 }
 
-// Function to compute (base^exp) % mod
-int modExp(int base, int exp, int mod) {
-    int result = 1;
-    base = base % mod;
-
+// Function to compute modular exponentiation
+long long modExp(long long base, long long exp, long long mod) {
+    long long result = 1;
     while (exp > 0) {
         if (exp % 2 == 1) {
             result = (result * base) % mod;
         }
-        exp = exp >> 1; // Divide by 2
         base = (base * base) % mod;
+        exp /= 2;
     }
-
     return result;
 }
 
+// Function to encrypt a message
+long long encrypt(int message, int e, int n) {
+    return modExp(message, e, n);
+}
+
+// Function to decrypt a message
+long long decrypt(long long encryptedMessage, int d, int n) {
+    return modExp(encryptedMessage, d, n);
+}
+
 int main() {
-    // Given values
-    int p = 17;
-    int q = 11;
-    int plaintext = 88;
+    // Step 1: User inputs prime numbers p, q and e
+    int p, q, e;
+    cout << "Enter prime number p: ";
+    cin >> p;
+    cout << "Enter prime number q: ";
+    cin >> q;
 
-    // Step 1: Compute n = p * q
+    // Step 2: Compute n and Euler's Totient Function (phi)
     int n = p * q;
-
-    // Step 2: Compute phi(n) = (p-1) * (q-1)
     int phi = (p - 1) * (q - 1);
 
-    // Step 3: Choose e such that 1 < e < phi and gcd(e, phi) = 1
-    int e = 7; // Commonly used public exponent
+    // Step 3: Input and validate e (public key exponent)
+    cout << "Enter public key exponent e (should be coprime with phi): ";
+    cin >> e;
+    while (gcd(e, phi) != 1) {
+        cout << "e is not coprime with phi. Enter a valid e: ";
+        cin >> e;
+    }
 
-    // Step 4: Compute d, the modular inverse of e mod phi
+    // Step 4: Compute d (private key exponent)
     int d = modInverse(e, phi);
 
-    // Step 5: Encrypt the plaintext: C = (M^e) mod n
-    int ciphertext = modExp(plaintext, e, n);
+    // Output the values of n, phi, d, public key, and private key
+    cout << "\nCalculated Values:" << endl;
+    cout << "n (p * q) = " << n << endl;
+    cout << "phi (Euler's Totient) = " << phi << endl;
+    cout << "d (private key exponent) = " << d << endl;
+    cout << "Public Key: (" << e << ", " << n << ")" << endl;
+    cout << "Private Key: (" << d << ", " << n << ")" << endl;
 
-    // Step 6: Decrypt the ciphertext: M = (C^d) mod n
-    int decryptedText = modExp(ciphertext, d, n);
+    // Step 5: Encryption
+    int message;
+    cout << "\nEnter a message to encrypt (as an integer): ";
+    cin >> message;
+    long long encryptedMessage = encrypt(message, e, n);
+    cout << "Encrypted Message: " << encryptedMessage << endl;
 
-    // Output the results
-    cout << "Public Key (e, n): (" << e << ", " << n << ")" << endl;
-    cout << "Private Key (d, n): (" << d << ", " << n << ")" << endl;
-    cout << "Plaintext: " << plaintext << endl;
-    cout << "Ciphertext: " << ciphertext << endl;
-    cout << "Decrypted Text: " << decryptedText << endl;
+    // Step 6: Decryption
+    long long decryptedMessage = decrypt(encryptedMessage, d, n);
+    cout << "Decrypted Message: " << decryptedMessage << endl;
 
     return 0;
 }
-
