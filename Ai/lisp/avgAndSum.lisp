@@ -1,15 +1,12 @@
-(defun readNums (n)
-    (loop repeat n
-        collect (read)))
 
-(format t "Enter the value of n: ")
-(setq n (read))
-
-(format t "Enter the numbers: ")
-(setq nums (readNums n))
-
-(setq sum (apply #'+ nums))
-(setq avg (/ sum n))
-
-(format t "Sum = ~a~%" sum)
-(format t "Average = ~,2f~%" avg)
+ (defun sumnum(n1 n2 n3 n4)
+(+ n1 n2 n3 n4))
+SUMNUM
+[3]> (sumnum 10 20 30 40)
+100
+[4]> (defun avgnum(n1 n2 n3 n4)
+(/(+ n1 n2 n3 n4)4)
+)
+AVGNUM
+[5]> (avgnum 10 20 30 40)
+25
